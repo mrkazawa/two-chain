@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>Bootstrap Example</title>
+  <title>2FA App - Login</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
@@ -39,14 +39,14 @@
   <div class="container">
     <div class="row">
       <div class="form_bg">
-        <form>
+        <form action="do_login" method="POST">
           <h2 class="text-center">Login Page</h2>
           <br />
           <div class="form-group">
-            <input type="email" class="form-control" id="userid" placeholder="User id">
+            <input type="email" class="form-control" name="email" placeholder="Email">
           </div>
           <div class="form-group">
-            <input type="password" class="form-control" id="pwd" placeholder="Password">
+            <input type="password" class="form-control" name="password" placeholder="Password">
           </div>
           <br />
           <div class="align-center">
