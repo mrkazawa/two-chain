@@ -1,0 +1,36 @@
+{
+  "name": "auth_contract_use_case",
+  "version": "1.0.0",
+  "description": "List of dependency: npm install -g truffle npm install -g ganache-cli npm install truffle-assertions npm i --save bs58 npm install --save web3 npm install eth-crypto --save",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mrkazawa/auth_contract_use_case.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mrkazawa/auth_contract_use_case/issues"
+  },
+  "homepage": "https://github.com/mrkazawa/auth_contract_use_case#readme",
+  "dependencies": {
+    "bs58": "^4.0.1",
+    "eth-crypto": "^1.4.0",
+    "express": "^4.17.1",
+    "express-session": "^1.17.0",
+    "ganache-cli": "^6.6.0",
+    "ipfs-http-client": "^33.1.1",
+    "mysql": "^2.17.1",
+    "request": "^2.88.0",
+    "request-promise-native": "^1.0.7",
+    "truffle": "^5.0.33",
+    "truffle-assertions": "^0.9.1",
+    "web3": "^1.2.1"
+  }
+}
