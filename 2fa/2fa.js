@@ -18,10 +18,12 @@ app.use(session({
   resave: true,
   saveUninitialized: true
 }));
-app.use(bodyParser.urlencoded({
-  extended: true
-}));
+
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
+
+app.set('views',  __dirname + '/views')
+app.set('view engine', 'ejs')
 
 /**
  * Display login page.
@@ -52,7 +54,7 @@ app.post('/do_login', function (request, response) {
       if (row) {
         request.session.loggedin = true;
 				request.session.username = email;
-				response.redirect('/home');
+				response.redirect('/');
       } else {
         response.send('Username or Password wrong!');
         response.end();
@@ -103,13 +105,17 @@ app.get('/setting', function (request, response) {
   response.sendFile(path.join(__dirname + '/register.html'));
 });
 
-app.get('/home', function (request, response) {
+/**
+ * Render the home page.
+ */
+app.get('/', function (request, response) {
   if (request.session.loggedin) {
-    response.send('Welcome back, ' + request.session.username + '!');
+    response.render('index', {
+      loggedIn:true,
+      username:request.session.username});
   } else {
-    response.send('Please login to view this page!');
+    response.render('index', {loggedIn:false});
   }
-  response.end();
 });
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));

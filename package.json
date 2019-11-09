@@ -21,6 +21,7 @@
   "homepage": "https://github.com/mrkazawa/auth_contract_use_case#readme",
   "dependencies": {
     "bs58": "^4.0.1",
+    "ejs": "^2.7.1",
     "eth-crypto": "^1.4.0",
     "express": "^4.17.1",
     "express-session": "^1.17.0",
