@@ -26,7 +26,7 @@
       bottom: 0;
       left: 0;
       width: 320px;
-      height: 280px;
+      height: 340px;
     }
 
     .align-center {
@@ -43,10 +43,13 @@
           <h2 class="text-center">Register Page</h2>
           <br />
           <div class="form-group">
-            <input type="email" class="form-control" name="email" placeholder="Email">
+            <input type="email" class="form-control" name="email" placeholder="Email" required>
           </div>
           <div class="form-group">
-            <input type="password" class="form-control" name="password" placeholder="Password">
+            <input type="password" class="form-control" name="password" id="password" placeholder="Password" required>
+          </div>
+          <div class="form-group">
+            <input type="password" class="form-control" id="confirm_password" placeholder="Confirm Password" required>
           </div>
           <br />
           <div class="align-center">
@@ -56,6 +59,22 @@
       </div>
     </div>
   </div>
+
+  <script>
+    var password = document.getElementById("password"),
+      confirm_password = document.getElementById("confirm_password");
+
+    function validatePassword() {
+      if (password.value != confirm_password.value) {
+        confirm_password.setCustomValidity("Passwords Don't Match");
+      } else {
+        confirm_password.setCustomValidity('');
+      }
+    }
+
+    password.onchange = validatePassword;
+    confirm_password.onkeyup = validatePassword;
+  </script>
 </body>
 
 </html>
