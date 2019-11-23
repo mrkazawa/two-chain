@@ -25,17 +25,19 @@ app.use(bodyParser.json());
 app.set('views',  __dirname + '/views');
 app.set('view engine', 'ejs');
 
+//------------------------------------ Login ------------------------------------//
+
 /**
  * Display login page.
  */
-app.get('/login', function (request, response) {
+app.get('/login', isNotLoggedIn, function (request, response) {
   response.render('login');
 });
 
 /**
  * Run after submission on the login page.
  */
-app.post('/do_login', function (request, response) {
+app.post('/do_login', isNotLoggedIn, function (request, response) {
   var email = request.body.email;
   var password = request.body.password;
 
@@ -67,27 +69,19 @@ app.post('/do_login', function (request, response) {
   }
 });
 
-/**
- * Run when clicking logout button
- */
-app.get('/do_logout', function (request, response) {
-  request.session.loggedIn = false;
-  request.session.username = '';
-  request.session.userId = '';
-  response.redirect('/');
-});
+//------------------------------------ Register ------------------------------------//
 
 /**
  * Display register page.
  */
-app.get('/register', function (request, response) {
+app.get('/register', isNotLoggedIn, function (request, response) {
   response.render('register');
 });
 
 /**
  * Run after submission on the register page.
  */
-app.post('/do_register', function (request, response) {
+app.post('/do_register', isNotLoggedIn, function (request, response) {
   var email = request.body.email;
   var password = request.body.password;
 
@@ -103,8 +97,10 @@ app.post('/do_register', function (request, response) {
       // get the last insert id
       console.log(`A row has been inserted with rowid ${this.lastID}`);
      
-      response.send('Username and Password Received!');
-      response.end();
+      request.session.loggedIn = true;
+      request.session.username = email;
+      request.session.userId = this.lastID;
+      response.redirect('/');
     });
   } else {
     response.send('Please enter Username and Password!');
@@ -112,10 +108,12 @@ app.post('/do_register', function (request, response) {
   }
 });
 
+//------------------------------------ Setting ------------------------------------//
+
 /**
  * Render the setting page.
  */
-app.get('/setting', function (request, response) {
+app.get('/setting', isLoggedIn, function (request, response) {
   let id = request.session.userId;
   let sql = `SELECT * FROM users WHERE id = ?`;
   let placeholder = [id];
@@ -147,7 +145,7 @@ app.get('/setting', function (request, response) {
 /**
  * Run after submission on the setting page.
  */
-app.post('/do_setting', function (request, response) {
+app.post('/do_setting', isLoggedIn, function (request, response) {
   var email = request.body.email;
   var password = request.body.password;
   var mfaEnabled = request.body.enable_mfa;
@@ -174,23 +172,52 @@ app.post('/do_setting', function (request, response) {
   }
 });
 
+//------------------------------------ Logout ------------------------------------//
+
+/**
+ * Run when clicking logout button.
+ */
+app.get('/do_logout', isLoggedIn, function (request, response) {
+  request.session.loggedIn = false;
+  request.session.username = '';
+  request.session.userId = '';
+  response.redirect('/');
+});
+
+//------------------------------------ Home ------------------------------------//
+
 /**
  * Render the home page.
  */
 app.get('/', function (request, response) {
   if (request.session.loggedIn) {
     response.render('index', {
-      loggedIn:true,
-      username:request.session.username});
+      loggedIn: true,
+      username: request.session.username,
+      userId: request.session.userId});
   } else {
-    // development only, set to true to bypass login procedure
-    request.session.loggedIn = true;
-    request.session.username = 'admin@2fa.com';
-    request.session.userId = 1;
-    response.render('index', {
-      loggedIn:true,
-      username:request.session.username});
+    response.render('index', {loggedIn: false});
   }
 });
+
+//------------------------------------ Filters ------------------------------------//
+
+function isLoggedIn(request, response, next) {
+  // if user is authenticated in the session, carry on 
+  if (request.session.loggedIn) {
+    return next();
+  }
+  // if they aren't redirect them to the home page
+  response.redirect('/');
+}
+
+function isNotLoggedIn(request, response, next) {
+  // if user is not authenticated in the session, carry on 
+  if (!request.session.loggedIn) {
+    return next();
+  }
+  // if they aren't redirect them to the home page
+  response.redirect('/');
+}
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
