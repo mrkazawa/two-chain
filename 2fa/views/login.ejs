@@ -3,7 +3,7 @@
 
 <head>
   <!-- Theme Made By www.w3schools.com - No Copyright -->
-  <title>2FA - Setting</title>
+  <title>2FA - Login</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
@@ -85,13 +85,7 @@
       </div>
       <div class="collapse navbar-collapse" id="myNavbar">
         <ul class="nav navbar-nav navbar-right">
-          <% if (loggedIn) { %>
-          <li><a href="setting">Setting</a></li>
-          <li><a href="do_logout">Logout</a></li>
-          <% } else { %>
-          <li><a href="login">Login</a></li>
           <li><a href="register">Register</a></li>
-          <% }%>
         </ul>
       </div>
     </div>
@@ -99,42 +93,20 @@
 
   <!-- First Container -->
   <div class="container-fluid bg-3">
-    <form action="do_setting" method="POST">
-      <h2 class="text-center">Huh, Wrong info?</h2>
+    <form action="do_login" method="POST">
+      <h2 class="text-center">Wait, Who are you again?</h2>
       <br />
       <div class="form-group">
         <label for="email">Email:</label>
-        <input type="email" class="form-control" name="email" value="<%= email %>" required>
+        <input type="email" class="form-control" name="email" required>
       </div>
       <div class="form-group">
-          <label for="password">Password:</label>
-        <input type="password" class="form-control" name="password" id="password" value="<%= password %>" required>
+        <label for="password">Password:</label>
+        <input type="password" class="form-control" name="password" required>
       </div>
-      <div class="form-group">
-        <label for="enablemfa">Multi-factor Authentication Enabled:</label>
-        <div class="radio">
-          <% if (mfaEnabled == 1) { %>
-          <label><input type="radio" name="enable_mfa" value="1" checked>Yes</label>
-          <% } else { %>
-          <label><input type="radio" name="enable_mfa" value="1">Yes</label>
-          <% }%>
-        </div>
-        <div class="radio">
-          <% if (mfaEnabled == 0) { %>
-          <label><input type="radio" name="enable_mfa" value="0" checked>No</label>
-          <% } else { %>
-          <label><input type="radio" name="enable_mfa" value="0">No</label>
-          <% }%>
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="pubkey">Public Key Address:</label>
-        <textarea class="form-control" rows="5" name="pub_key" id="pub_key"><%= ethAddress %></textarea>
-      </div>
-      <input type="hidden" id="userId" name="userId" value="<%= userId %>">
       <br />
       <div class="align-center">
-        <button type="submit" class="btn btn-primary" id="login">Update</button>
+        <button type="submit" class="btn btn-primary" id="login">Login</button>
       </div>
     </form>
   </div>

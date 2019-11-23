@@ -22,14 +22,14 @@ app.use(session({
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
-app.set('views',  __dirname + '/views')
-app.set('view engine', 'ejs')
+app.set('views',  __dirname + '/views');
+app.set('view engine', 'ejs');
 
 /**
  * Display login page.
  */
 app.get('/login', function (request, response) {
-  response.sendFile(path.join(__dirname + '/login.html'));
+  response.render('login');
 });
 
 /**
@@ -81,7 +81,7 @@ app.get('/do_logout', function (request, response) {
  * Display register page.
  */
 app.get('/register', function (request, response) {
-  response.sendFile(path.join(__dirname + '/register.html'));
+  response.render('register');
 });
 
 /**
