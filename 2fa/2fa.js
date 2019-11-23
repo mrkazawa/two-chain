@@ -41,32 +41,29 @@ app.post('/do_login', isNotLoggedIn, function (request, response) {
   var email = request.body.email;
   var password = request.body.password;
 
-  // check if there is a value
-  if (email && password) {
-    let sql = `SELECT id, email FROM users WHERE email = ? and password = ?`;
-    let placeholder = [email, password]
+  let sql = `SELECT id, email FROM users WHERE email = ? and password = ?`;
+  let placeholder = [email, password]
 
-    // first row only
-    db.get(sql, placeholder, (err, row) => {
-      if (err) {
-        response.send('Fails to query data to the database!');
-        return console.error(err.message);
-      }
+  // first row only
+  db.get(sql, placeholder, (err, row) => {
+    if (err) {
+      response.send('Fails to query data to the database!');
+      return console.error(err.message);
+    }
 
-      if (row) {
-        request.session.loggedIn = true;
-        request.session.username = row.email;
-        request.session.userId = row.id;
-				response.redirect('/');
-      } else {
-        response.send('Username or Password wrong!');
-        response.end();
-      }
-    });
-  } else {
-    response.send('Please enter Username and Password!');
-    response.end();
-  }
+    if (row) {
+      request.session.loggedIn = true;
+      request.session.username = row.email;
+      request.session.userId = row.id;
+      response.redirect('/');
+    } else {
+      response.redirect('/failed_login');
+    }
+  });
+});
+
+app.get('/failed_login', isNotLoggedIn, function (request, response) {
+  response.render('failed_login');
 });
 
 //------------------------------------ Register ------------------------------------//
@@ -85,27 +82,21 @@ app.post('/do_register', isNotLoggedIn, function (request, response) {
   var email = request.body.email;
   var password = request.body.password;
 
-  // check if there is a value
-  if (email && password) {
-    // insert to database
-    var placeholder = [email, password]
-    db.run(`INSERT INTO users(email,password) VALUES(?,?)`, placeholder, function (err) {
-      if (err) {
-        response.send('Fails to insert data to the database!');
-        return console.log(err.message);
-      }
-      // get the last insert id
-      console.log(`A row has been inserted with rowid ${this.lastID}`);
-     
-      request.session.loggedIn = true;
-      request.session.username = email;
-      request.session.userId = this.lastID;
-      response.redirect('/');
-    });
-  } else {
-    response.send('Please enter Username and Password!');
-    response.end();
-  }
+  // insert to database
+  var placeholder = [email, password]
+  db.run(`INSERT INTO users(email,password) VALUES(?,?)`, placeholder, function (err) {
+    if (err) {
+      response.send('Fails to insert data to the database!');
+      return console.log(err.message);
+    }
+    // get the last insert id
+    console.log(`A row has been inserted with rowid ${this.lastID}`);
+    
+    request.session.loggedIn = true;
+    request.session.username = email;
+    request.session.userId = this.lastID;
+    response.redirect('/');
+  });
 });
 
 //------------------------------------ Setting ------------------------------------//
@@ -137,7 +128,7 @@ app.get('/setting', isLoggedIn, function (request, response) {
       response.render('setting', data);
     } else {
       response.send('Not matched userId');
-      response.end();
+      return console.error(`Not matched userId ${id}`);
     }
   });
 });
@@ -152,24 +143,21 @@ app.post('/do_setting', isLoggedIn, function (request, response) {
   var ethAddress = request.body.pub_key;
   var userId = request.body.userId;
 
-  // check if there is a value
-  if (email && password) {
-    // insert to database
-    var placeholder = [email, password, mfaEnabled, ethAddress, userId]
-    db.run(`UPDATE users SET email = ?, password = ?, mfa_enabled = ?, eth_address = ? WHERE id = ?`, placeholder, function (err) {
-      if (err) {
-        response.send('Fails to insert data to the database!');
-        return console.log(err.message);
-      }
-      console.log(`Row(s) updated: ${this.changes}`);
-     
-      response.send('Updated successfully!');
-      response.end();
-    });
-  } else {
-    response.send('Please enter Username and Password!');
-    response.end();
-  }
+  // update to database
+  var placeholder = [email, password, mfaEnabled, ethAddress, userId]
+  db.run(`UPDATE users SET email = ?, password = ?, mfa_enabled = ?, eth_address = ? WHERE id = ?`, placeholder, function (err) {
+    if (err) {
+      response.send('Fails to insert data to the database!');
+      return console.log(err.message);
+    }
+
+    console.log(`Row(s) updated: ${this.changes}`);
+    response.redirect('/success_setting');
+  });
+});
+
+app.get('/success_setting', isLoggedIn, function (request, response) {
+  response.render('success_setting');
 });
 
 //------------------------------------ Logout ------------------------------------//

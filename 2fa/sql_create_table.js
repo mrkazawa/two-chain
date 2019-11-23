@@ -15,7 +15,7 @@ db.run('CREATE TABLE IF NOT EXISTS users( \
   email TEXT NOT NULL UNIQUE, \
   password TEXT NOT NULL, \
   mfa_enabled INTEGER DEFAULT 0, \
-  eth_address TEXT UNIQUE); \
+  eth_address TEXT); \
 ');
 
 // close the database connection
