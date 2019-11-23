@@ -140,7 +140,7 @@ app.post('/do_setting', isLoggedIn, function (request, response) {
   var email = request.body.email;
   var password = request.body.password;
   var mfaEnabled = request.body.enable_mfa;
-  var ethAddress = request.body.pub_key;
+  var ethAddress = request.body.eth_address;
   var userId = request.body.userId;
 
   // update to database

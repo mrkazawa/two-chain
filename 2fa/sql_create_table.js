@@ -18,6 +18,15 @@ db.run('CREATE TABLE IF NOT EXISTS users( \
   eth_address TEXT); \
 ');
 
+console.log("create database table 2FA codes");
+db.run('CREATE TABLE IF NOT EXISTS codes( \
+  id INTEGER PRIMARY KEY AUTOINCREMENT, \
+  code TEXT NOT NULL UNIQUE, \
+  date_created INTEGER NOT NULL, \
+  date_expired INTEGER NOT NULL, \
+  user_id INTEGER NOT NULL); \
+');
+
 // close the database connection
 db.close((err) => {
   if (err) {

@@ -12,6 +12,9 @@ let db = new sqlite3.Database('../auth.db', (err) => {
 console.log("delete database table users");
 db.run('DROP TABLE users');
 
+console.log("delete database table codes");
+db.run('DROP TABLE 2fa_codes');
+
 // close the database connection
 db.close((err) => {
   if (err) {
