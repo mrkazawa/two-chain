@@ -41,7 +41,7 @@ app.post('/do_login', function (request, response) {
 
   // check if there is a value
   if (email && password) {
-    let sql = `SELECT email FROM users WHERE email = ? and password = ?`;
+    let sql = `SELECT id, email FROM users WHERE email = ? and password = ?`;
     let placeholder = [email, password]
 
     // first row only
@@ -53,7 +53,8 @@ app.post('/do_login', function (request, response) {
 
       if (row) {
         request.session.loggedIn = true;
-				request.session.username = email;
+        request.session.username = row.email;
+        request.session.userId = row.id;
 				response.redirect('/');
       } else {
         response.send('Username or Password wrong!');
@@ -72,6 +73,7 @@ app.post('/do_login', function (request, response) {
 app.get('/do_logout', function (request, response) {
   request.session.loggedIn = false;
   request.session.username = '';
+  request.session.userId = '';
   response.redirect('/');
 });
 
@@ -110,8 +112,66 @@ app.post('/do_register', function (request, response) {
   }
 });
 
+/**
+ * Render the setting page.
+ */
 app.get('/setting', function (request, response) {
-  response.sendFile(path.join(__dirname + '/register.html'));
+  let id = request.session.userId;
+  let sql = `SELECT * FROM users WHERE id = ?`;
+  let placeholder = [id];
+
+  // first row only
+  db.get(sql, placeholder, (err, row) => {
+    if (err) {
+      response.send('Fails to query data to the database!');
+      return console.error(err.message);
+    }
+
+    if (row) {
+      let data = {
+        loggedIn: true,
+        userId: row.id,
+        email: row.email,
+        password: row.password,
+        mfaEnabled: row.mfa_enabled,
+        ethAddress: row.eth_address
+      };
+      response.render('setting', data);
+    } else {
+      response.send('Not matched userId');
+      response.end();
+    }
+  });
+});
+
+/**
+ * Run after submission on the setting page.
+ */
+app.post('/do_setting', function (request, response) {
+  var email = request.body.email;
+  var password = request.body.password;
+  var mfaEnabled = request.body.enable_mfa;
+  var ethAddress = request.body.pub_key;
+  var userId = request.body.userId;
+
+  // check if there is a value
+  if (email && password) {
+    // insert to database
+    var placeholder = [email, password, mfaEnabled, ethAddress, userId]
+    db.run(`UPDATE users SET email = ?, password = ?, mfa_enabled = ?, eth_address = ? WHERE id = ?`, placeholder, function (err) {
+      if (err) {
+        response.send('Fails to insert data to the database!');
+        return console.log(err.message);
+      }
+      console.log(`Row(s) updated: ${this.changes}`);
+     
+      response.send('Updated successfully!');
+      response.end();
+    });
+  } else {
+    response.send('Please enter Username and Password!');
+    response.end();
+  }
 });
 
 /**
@@ -123,7 +183,13 @@ app.get('/', function (request, response) {
       loggedIn:true,
       username:request.session.username});
   } else {
-    response.render('index', {loggedIn:false});
+    // development only, set to true to bypass login procedure
+    request.session.loggedIn = true;
+    request.session.username = 'admin@2fa.com';
+    request.session.userId = 1;
+    response.render('index', {
+      loggedIn:true,
+      username:request.session.username});
   }
 });
 
