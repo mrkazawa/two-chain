@@ -52,7 +52,7 @@ app.post('/do_login', function (request, response) {
       }
 
       if (row) {
-        request.session.loggedin = true;
+        request.session.loggedIn = true;
 				request.session.username = email;
 				response.redirect('/');
       } else {
@@ -64,6 +64,15 @@ app.post('/do_login', function (request, response) {
     response.send('Please enter Username and Password!');
     response.end();
   }
+});
+
+/**
+ * Run when clicking logout button
+ */
+app.get('/do_logout', function (request, response) {
+  request.session.loggedIn = false;
+  request.session.username = '';
+  response.redirect('/');
 });
 
 /**
@@ -109,7 +118,7 @@ app.get('/setting', function (request, response) {
  * Render the home page.
  */
 app.get('/', function (request, response) {
-  if (request.session.loggedin) {
+  if (request.session.loggedIn) {
     response.render('index', {
       loggedIn:true,
       username:request.session.username});
