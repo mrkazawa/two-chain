@@ -41,7 +41,7 @@ app.post('/do_login', isNotLoggedIn, function (request, response) {
   var email = request.body.email;
   var password = request.body.password;
 
-  let sql = `SELECT id, email FROM users WHERE email = ? and password = ?`;
+  let sql = `SELECT id, email, mfa_enabled FROM users WHERE email = ? and password = ?`;
   let placeholder = [email, password]
 
   // first row only
@@ -51,7 +51,13 @@ app.post('/do_login', isNotLoggedIn, function (request, response) {
       return console.error(err.message);
     }
 
+    // login using username and password successful
     if (row) {
+      // when 2fa is enabled
+      if (row.mfa_enabled == 1) {
+        
+      }
+
       request.session.loggedIn = true;
       request.session.username = row.email;
       request.session.userId = row.id;
