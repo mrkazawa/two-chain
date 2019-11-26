@@ -141,7 +141,7 @@ app.post('/do_setting', isLoggedIn, function (request, response) {
   var password = request.body.password;
   var mfaEnabled = request.body.enable_mfa;
   var ethAddress = request.body.eth_address;
-  var userId = request.body.userId;
+  var userId = request.session.userId;
 
   // update to database
   var placeholder = [email, password, mfaEnabled, ethAddress, userId]
@@ -193,7 +193,7 @@ app.get('/setup_mfa', isLoggedIn, function (request, response) {
  */
 app.post('/do_register_mfa', isLoggedIn, function (request, response) {
   var ethAddress = request.body.eth_address;
-  var userId = request.body.userId;
+  var userId = request.session.userId;
   var mfaEnabled = 1;
 
   // update to database

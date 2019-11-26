@@ -111,30 +111,27 @@
         <input type="password" class="form-control" name="password" id="password" value="<%= password %>" required>
       </div>
       <div class="form-group">
-        <label for="enablemfa">Multi-factor Authentication Enabled:</label>
-        <div class="radio">
-          <% if (mfaEnabled == 1) { %>
-          <label><input type="radio" name="enable_mfa" value="1" checked>Yes</label>
-          <% } else { %>
-          <label><input type="radio" name="enable_mfa" value="1">Yes</label>
-          <% }%>
-        </div>
-        <div class="radio">
-          <% if (mfaEnabled == 0) { %>
-          <label><input type="radio" name="enable_mfa" value="0" checked>No</label>
-          <% } else { %>
-          <label><input type="radio" name="enable_mfa" value="0">No</label>
-          <% }%>
-        </div>
+        <% if (mfaEnabled == 1) { %>
+        <label>Two Factor Authentication is ENABLED</label>
+        <% } else { %>
+        <label>Two Factor Authentication is DISABLED</label>
+        <% } %>
       </div>
+      <% if (mfaEnabled == 1) { %>
       <div class="form-group">
         <label for="pubkey">Ethereum Address:</label>
-        <textarea class="form-control" rows="5" name="eth_address" id="eth_address"><%= ethAddress %></textarea>
+        <textarea class="form-control" rows="5" name="eth_address" id="eth_address" readonly><%= ethAddress %></textarea>
       </div>
-      <input type="hidden" id="userId" name="userId" value="<%= userId %>">
+      <% } %>
       <br />
       <div class="align-center">
-        <button type="submit" class="btn btn-primary" id="login">Update</button>
+        <button type="submit" class="btn btn-primary" id="login">Update Info</button>
+        <% if (mfaEnabled == 1) { %>
+        <a href="/setup_mfa" class="btn btn-warning">Update 2FA</a>
+        <a href="/delete_mfa" class="btn btn-danger">Delete 2FA</a>
+        <% } else { %>
+        <a href="/setup_mfa" class="btn btn-warning">Setup 2FA</a>
+        <% } %>
       </div>
     </form>
   </div>
