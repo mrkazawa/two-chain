@@ -160,6 +160,59 @@ app.get('/success_setting', isLoggedIn, function (request, response) {
   response.render('success_setting');
 });
 
+/**
+ * Render the setup mfa page.
+ */
+app.get('/setup_mfa', isLoggedIn, function (request, response) {
+  let id = request.session.userId;
+  let sql = `SELECT id FROM users WHERE id = ?`;
+  let placeholder = [id];
+
+  // first row only
+  db.get(sql, placeholder, (err, row) => {
+    if (err) {
+      response.send('Fails to query data to the database!');
+      return console.error(err.message);
+    }
+
+    if (row) {
+      let data = {
+        loggedIn: true,
+        userId: row.id,
+      };
+      response.render('setup_mfa', data);
+    } else {
+      response.send('Not matched userId');
+      return console.error(`Not matched userId ${id}`);
+    }
+  });
+});
+
+/**
+ * Run after submission on the setup mfa page.
+ */
+app.post('/do_register_mfa', isLoggedIn, function (request, response) {
+  var ethAddress = request.body.eth_address;
+  var userId = request.body.userId;
+  var mfaEnabled = 1;
+
+  // update to database
+  var placeholder = [mfaEnabled, ethAddress, userId]
+  db.run(`UPDATE users SET mfa_enabled = ?, eth_address = ? WHERE id = ?`, placeholder, function (err) {
+    if (err) {
+      response.send('Fails to insert data to the database!');
+      return console.log(err.message);
+    }
+
+    console.log(`Row(s) updated: ${this.changes}`);
+    response.redirect('/success_setup');
+  });
+});
+
+app.get('/success_setup', isLoggedIn, function (request, response) {
+  response.render('success_setup');
+});
+
 //------------------------------------ Logout ------------------------------------//
 
 /**
