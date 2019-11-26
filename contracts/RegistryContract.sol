@@ -11,6 +11,7 @@ contract RegistryContract {
   mapping (address => Identity) public entities;
 
   event NewEntityAdded(address sender);
+  event EntityRevoked(address sender);
 
   modifier entityMustExist(address entity) {
     require(entities[entity].isValue, "entity must exist");
@@ -19,6 +20,11 @@ contract RegistryContract {
 
   modifier entityMustNotExist(address entity) {
     require(!entities[entity].isValue, "entity must not exist");
+    _;
+  }
+
+  modifier entityMustNotRevoked(address entity) {
+    require(!entities[entity].isRevoked, "entity must not revoked");
     _;
   }
 
@@ -33,5 +39,18 @@ contract RegistryContract {
     i.isRevoked = false;
 
     emit NewEntityAdded(msg.sender);
+  }
+
+  function revokeEntity() public
+  entityMustExist(msg.sender)
+  entityMustNotRevoked(msg.sender) {
+    entities[msg.sender].isRevoked = true;
+
+    emit EntityRevoked(msg.sender);
+  }
+
+  function isEntityRevoked(address entity) public view
+  returns (bool) {
+    return (entities[entity].isRevoked == true);
   }
 }

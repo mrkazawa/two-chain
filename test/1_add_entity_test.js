@@ -1,7 +1,7 @@
 const RegistryContract = artifacts.require("RegistryContract");
 const truffleAssert = require('truffle-assertions');
 
-contract('Gateway Authentication -- Storing Payload Test', (accounts) => {
+contract('Storing Entity Test', (accounts) => {
   const userAddress = accounts[1]; // user address
   let RC;
 
