@@ -53,4 +53,9 @@ contract RegistryContract {
   returns (bool) {
     return (entities[entity].isRevoked == true);
   }
+
+  function isEntityExist(address entity) public view
+  returns (bool) {
+    return (entities[entity].isValue == true);
+  }
 }
