@@ -27,6 +27,7 @@
     "express-session": "^1.17.0",
     "ganache-cli": "^6.6.0",
     "ipfs-http-client": "^33.1.1",
+    "prompts": "^2.3.0",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.7",
     "sqlite3": "^4.1.0",
