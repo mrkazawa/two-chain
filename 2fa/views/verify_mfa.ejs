@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Theme Made By www.w3schools.com - No Copyright -->
+  <title>2FA - Verify MFA</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+  <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+  <style>
+    body {
+      font: 20px Montserrat, sans-serif;
+      line-height: 1.8;
+      color: #f5f6f7;
+    }
+
+    p {
+      font-size: 16px;
+    }
+
+    .margin {
+      margin-bottom: 45px;
+    }
+
+    .bg-1 {
+      background-color: #1abc9c;
+      /* Green */
+      color: #ffffff;
+    }
+
+    .bg-2 {
+      background-color: #474e5d;
+      /* Dark Blue */
+      color: #ffffff;
+    }
+
+    .bg-3 {
+      background-color: #ffffff;
+      /* White */
+      color: #555555;
+    }
+
+    .bg-4 {
+      background-color: #2f2f2f;
+      /* Black Gray */
+      color: #fff;
+    }
+
+    .container-fluid {
+      padding-top: 70px;
+      padding-bottom: 70px;
+    }
+
+    .navbar {
+      padding-top: 15px;
+      padding-bottom: 15px;
+      border: 0;
+      border-radius: 0;
+      margin-bottom: 0;
+      font-size: 14px;
+      letter-spacing: 1px;
+    }
+
+    .navbar-nav li a:hover {
+      color: #1abc9c !important;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-default">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/">2FA Ethereum</a>
+      </div>
+      <div class="collapse navbar-collapse" id="myNavbar">
+        <ul class="nav navbar-nav navbar-right">
+          <% if (loggedIn) { %>
+          <li><a href="setting">Setting</a></li>
+          <li><a href="do_logout">Logout</a></li>
+          <% } else { %>
+          <li><a href="login">Login</a></li>
+          <li><a href="register">Register</a></li>
+          <% }%>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- First Container -->
+  <div class="container-fluid bg-3">
+    <h2 class="text-center">Wait, follow all these steps, okay!</h2>
+    <br />
+    
+    <ul style="list-style-type:circle;">
+      <li>First, copy our randomly generated code.</li>
+      <li>Second, sign the code with your private key associated to your Ethereum address below.</li>
+      <li>Third, submit your signature to us.</li>
+    </ul>
+    <br />
+    <h4><i>The code is only valid for 5 minutes, better be hurry.</i></h4>
+    <br />
+    <form action="do_verify_mfa" method="POST">
+      <div class="form-group">
+        <label for="code">Random Code:</label>
+        <input type="text" class="form-control" name="code" id="code" value="<%= code %>" required readonly>
+      </div>
+      <div class="form-group">
+        <label for="eth_address">Your registered Ethereum address:</label>
+        <textarea class="form-control" rows="3" name="eth_address" id="eth_address" readonly><%= ethAddress %></textarea>
+      </div>
+      <div class="form-group">
+        <label for="signature">Signature:</label>
+        <textarea class="form-control" rows="5" name="signature" id="signature"></textarea>
+      </div>
+      <input type="hidden" id="email" name="email" value="<%= email %>">
+      <br />
+      <div class="align-center">
+        <button type="submit" class="btn btn-primary" id="btn_signature">Submit Signature</button>
+      </div>
+    </form>
+  </div>
+
+</body>
+</html>
