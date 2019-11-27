@@ -32,7 +32,7 @@ const questions = [{
   // registering address
   if (response["value"] == 1) {
     if (!fs.existsSync(contractPath)) {
-      console.log(chalk.red('ERROR! Seems like you contract info is missing'));
+      console.log(chalk.red('ERROR! Seems like your contract info is missing'));
     } else if (!fs.existsSync(contractABIPath)) {
       console.log(chalk.red('ERROR! Seems like you have not deploy the contract yet'));
     } else {

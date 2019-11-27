@@ -3,7 +3,7 @@
 
 <head>
   <!-- Theme Made By www.w3schools.com - No Copyright -->
-  <title>2FA - Verify MFA</title>
+  <title>Setup 2FA</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
@@ -99,34 +99,22 @@
 
   <!-- First Container -->
   <div class="container-fluid bg-3">
-    <h2 class="text-center">Wait, follow all these steps, okay!</h2>
+    <h2 class="text-center">Follow all these steps, okay!</h2>
     <br />
-    
     <ul style="list-style-type:circle;">
-      <li>First, copy our randomly generated code.</li>
-      <li>Second, sign the code with your private key associated to your Ethereum address below.</li>
-      <li>Third, submit your signature to us.</li>
+      <li>First, generate an Ethereum address, or you can use any existing address as well.</li>
+      <li>Second, register your address in the blockchain.</li>
+      <li>Third, put your address below, we need to store it in our database as well.</li>
     </ul>
-    <br />
-    <h4><i>The code is only valid for 5 minutes, better be hurry.</i></h4>
-    <br />
-    <form action="do_verify_mfa" method="POST">
+    <br>
+    <form action="do_setup_2fa" method="POST">
       <div class="form-group">
-        <label for="code">Random Code:</label>
-        <input type="text" class="form-control" name="code" id="code" value="<%= code %>" required readonly>
+        <label for="eth_address">Ethereum Address:</label>
+        <textarea class="form-control" rows="5" name="eth_address" id="eth_address"></textarea>
       </div>
-      <div class="form-group">
-        <label for="eth_address">Your registered Ethereum address:</label>
-        <textarea class="form-control" rows="3" name="eth_address" id="eth_address" readonly><%= ethAddress %></textarea>
-      </div>
-      <div class="form-group">
-        <label for="signature">Signature:</label>
-        <textarea class="form-control" rows="5" name="signature" id="signature"></textarea>
-      </div>
-      <input type="hidden" id="email" name="email" value="<%= email %>">
       <br />
       <div class="align-center">
-        <button type="submit" class="btn btn-primary" id="btn_signature">Submit Signature</button>
+        <button type="submit" class="btn btn-primary">Register Address</button>
       </div>
     </form>
   </div>

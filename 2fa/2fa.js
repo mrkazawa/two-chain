@@ -66,9 +66,8 @@ app.post('/do_login', isNotLoggedIn, function (request, response) {
     if (row) {
       // when 2fa is enabled
       if (row.mfa_enabled == 1) {
-        console.log("masuk sini");
         request.session.userId = row.id;
-        response.redirect('/verify_mfa');
+        response.redirect('/verify_2fa');
       } else {
         request.session.loggedIn = true;
         request.session.username = row.email;
@@ -137,7 +136,7 @@ app.get('/setting', isLoggedIn, function (request, response) {
 
     if (row) {
       let data = {
-        loggedIn: true,
+        loggedIn: request.session.loggedIn,
         userId: row.id,
         email: row.email,
         password: row.password,
@@ -158,15 +157,13 @@ app.get('/setting', isLoggedIn, function (request, response) {
 app.post('/do_setting', isLoggedIn, function (request, response) {
   var email = request.body.email;
   var password = request.body.password;
-  var mfaEnabled = request.body.enable_mfa;
-  var ethAddress = request.body.eth_address;
   var userId = request.session.userId;
 
   // update to database
-  var placeholder = [email, password, mfaEnabled, ethAddress, userId]
-  db.run(`UPDATE users SET email = ?, password = ?, mfa_enabled = ?, eth_address = ? WHERE id = ?`, placeholder, function (err) {
+  var placeholder = [email, password, userId]
+  db.run(`UPDATE users SET email = ?, password = ? WHERE id = ?`, placeholder, function (err) {
     if (err) {
-      response.send('Fails to insert data to the database!');
+      response.send('Fails to update data to the database!');
       return console.log(err.message);
     }
 
@@ -182,37 +179,22 @@ app.get('/success_setting', isLoggedIn, function (request, response) {
 //------------------------------------ 2FA related ------------------------------------//
 
 /**
- * Render the setup mfa page.
+ * Render the setup 2fa page.
  */
-app.get('/setup_mfa', isLoggedIn, function (request, response) {
+app.get('/setup_2fa', isLoggedIn, function (request, response) {
   let id = request.session.userId;
-  let sql = `SELECT id FROM users WHERE id = ?`;
-  let placeholder = [id];
 
-  // first row only
-  db.get(sql, placeholder, (err, row) => {
-    if (err) {
-      response.send('Fails to query data to the database!');
-      return console.error(err.message);
-    }
-
-    if (row) {
-      let data = {
-        loggedIn: true,
-        userId: row.id,
-      };
-      response.render('setup_mfa', data);
-    } else {
-      response.send('Not matched userId');
-      return console.error(`Not matched userId ${id}`);
-    }
-  });
+  let data = {
+    loggedIn: request.session.loggedIn,
+    userId: id,
+  };
+  response.render('setup_2fa', data);
 });
 
 /**
- * Run after submission on the setup mfa page.
+ * Run after submission on the setup 2fa page.
  */
-app.post('/do_register_mfa', isLoggedIn, function (request, response) {
+app.post('/do_setup_2fa', isLoggedIn, function (request, response) {
   var ethAddress = request.body.eth_address;
   var userId = request.session.userId;
   var mfaEnabled = 1;
@@ -221,28 +203,28 @@ app.post('/do_register_mfa', isLoggedIn, function (request, response) {
   var placeholder = [mfaEnabled, ethAddress, userId]
   db.run(`UPDATE users SET mfa_enabled = ?, eth_address = ? WHERE id = ?`, placeholder, function (err) {
     if (err) {
-      response.send('Fails to insert data to the database!');
+      response.send('Fails to update data to the database!');
       return console.log(err.message);
     }
 
     console.log(`Row(s) updated: ${this.changes}`);
-    response.redirect('/success_setup');
+    response.redirect('/success_setup_2fa');
   });
 });
 
-app.get('/success_setup', isLoggedIn, function (request, response) {
-  response.render('success_setup');
+app.get('/success_setup_2fa', isLoggedIn, function (request, response) {
+  response.render('success_setup_2fa');
 });
 
 /**
- * Render the verify mfa page.
+ * Render the verify 2fa page.
  */
-app.get('/verify_mfa', isNotLoggedIn, function (request, response) {
+app.get('/verify_2fa', isNotLoggedIn, function (request, response) {
   let id = request.session.userId;
   let code = randomValueBase64(16);
-  let currentTime = Math.floor(new Date() / 1000);
+  let currentTime = Math.floor(new Date() / 1000); // in epoch time UNIX
   let mockDate = getDateInTheNextMinute(5);
-  let expiryTime = Math.floor(mockDate / 1000);
+  let expiryTime = Math.floor(mockDate / 1000); // in epoch time UNIX
 
   var placeholder = [code, currentTime, expiryTime, id];
   db.run(`INSERT INTO codes(code, date_created, date_expired, user_id) VALUES(?,?,?,?)`, placeholder, function (err) {
@@ -265,12 +247,12 @@ app.get('/verify_mfa', isNotLoggedIn, function (request, response) {
 
       if (row) {
         let data = {
-          loggedIn: false,
+          loggedIn: request.session.loggedIn,
           code: code,
           ethAddress: row.eth_address,
           email: row.email
         };
-        response.render('verify_mfa', data);
+        response.render('verify_2fa', data);
       } else {
         response.send('Not matched userId');
         return console.error(`Not matched userId ${id}`);
@@ -280,24 +262,23 @@ app.get('/verify_mfa', isNotLoggedIn, function (request, response) {
 });
 
 /**
- * Run after submission on the verify mfa page.
+ * Run after submission on the verify 2fa page.
  */
-app.post('/do_verify_mfa', isNotLoggedIn, async (request, response) => {
+app.post('/do_verify_2fa', isNotLoggedIn, async (request, response) => {
   var ethAddress = request.body.eth_address;
   var code = request.body.code;
   var signature = request.body.signature;
-  var email = request.body.email;
 
   let rawContractInfo = fs.readFileSync(contractPath);
   let info = JSON.parse(rawContractInfo);
   let rawContractABI = fs.readFileSync(contractABIPath);
   let abi = JSON.parse(rawContractABI);
 
+  const RC = new web3.eth.Contract(abi.abi, info.address);
+
   let rawServer = fs.readFileSync(serverPath);
   let server = JSON.parse(rawServer);
   let serverAddress = web3.utils.toChecksumAddress(server.address);
-
-  const RC = new web3.eth.Contract(abi.abi, info.address);
 
   const exist = await RC.methods.isEntityExist(ethAddress).call({
     from: serverAddress
@@ -310,8 +291,9 @@ app.post('/do_verify_mfa', isNotLoggedIn, async (request, response) => {
 
     // signature is valid
     if (signerAddress == ethAddress) {
-      let sql = `SELECT date_expired FROM codes WHERE code = ?`;
-      let placeholder = [code];
+      let id = request.session.userId;
+      let sql = `SELECT email, eth_address FROM users WHERE id = ?`;
+      let placeholder = [id];
 
       // first row only
       db.get(sql, placeholder, (err, row) => {
@@ -321,17 +303,41 @@ app.post('/do_verify_mfa', isNotLoggedIn, async (request, response) => {
         }
 
         if (row) {
-          let currentTime = Math.floor(new Date() / 1000);
-          if (currentTime < row.date_expired) {
-            request.session.username = email;
-            request.session.loggedIn = true;
-            response.redirect('/');
+          var email = row.email;
+
+          // the eth address is correctly for the given user
+          if (ethAddress == row.eth_address) {
+            let sql = `SELECT date_expired FROM codes WHERE code = ?`;
+            let placeholder = [code];
+
+            // first row only
+            db.get(sql, placeholder, (err, row) => {
+              if (err) {
+                response.send('Fails to query data to the database!');
+                return console.error(err.message);
+              }
+
+              if (row) {
+                let currentTime = Math.floor(new Date() / 1000);
+                // code is not expired
+                if (currentTime < row.date_expired) {
+                  request.session.username = email;
+                  request.session.loggedIn = true;
+                  response.redirect('/');
+                } else {
+                  // failed due to expired
+                }
+              } else {
+                response.send('Not matched code');
+                return console.error(`Not matched code ${code}`);
+              }
+            });
           } else {
-            // failed due to expired
+            // failed due to eth address is not for given user
           }
         } else {
           response.send('Not matched code');
-          return console.error(`Not matched code ${code}`);
+          return console.error(`Not matched userId ${id}`);
         }
       });
     } else {
@@ -362,19 +368,26 @@ app.get('/do_logout', isLoggedIn, function (request, response) {
 app.get('/', function (request, response) {
   if (request.session.loggedIn) {
     response.render('index', {
-      loggedIn: true,
+      loggedIn: request.session.loggedIn,
       username: request.session.username,
       userId: request.session.userId
     });
   } else {
     response.render('index', {
-      loggedIn: false
+      loggedIn: request.session.loggedIn
     });
   }
 });
 
 //------------------------------------ Tools ------------------------------------//
 
+/**
+ * Filter to intercept request to allow only logged in users to go through.
+ * 
+ * @param {*} request 
+ * @param {*} response 
+ * @param {*} next 
+ */
 function isLoggedIn(request, response, next) {
   if (request.session.loggedIn) {
     return next();
@@ -382,6 +395,13 @@ function isLoggedIn(request, response, next) {
   response.redirect('/');
 }
 
+/**
+ * Filter to intercept request to allow only loggged out users to go through.
+ * 
+ * @param {*} request 
+ * @param {*} response 
+ * @param {*} next 
+ */
 function isNotLoggedIn(request, response, next) {
   if (!request.session.loggedIn) {
     return next();
@@ -389,6 +409,11 @@ function isNotLoggedIn(request, response, next) {
   response.redirect('/');
 }
 
+/**
+ * Generate a random base 64 character.
+ * 
+ * @param {int} len   the length of the random character to generate
+ */
 function randomValueBase64(len) {
   return crypto
     .randomBytes(Math.ceil((len * 3) / 4))
@@ -398,6 +423,11 @@ function randomValueBase64(len) {
     .replace(/\//g, '0') // replace '/' with '0'
 }
 
+/**
+ * Get the date object in the next given minutes.
+ * 
+ * @param {int} minutes   the number of minutes in the future
+ */
 function getDateInTheNextMinute(minutes) {
   var now = new Date();
   now.setMinutes(now.getMinutes() + minutes);
