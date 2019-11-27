@@ -288,6 +288,7 @@ app.post('/do_verify_2fa', isNotLoggedIn, async (request, response) => {
   if (exist) {
     let codeHash = EthCrypto.hash.keccak256(code);
     let signerAddress = EthCrypto.recover(signature, codeHash);
+    console.log(signerAddress);
 
     // signature is valid
     if (signerAddress == ethAddress) {
@@ -326,6 +327,9 @@ app.post('/do_verify_2fa', isNotLoggedIn, async (request, response) => {
                   response.redirect('/');
                 } else {
                   // failed due to expired
+                  response.render('failed_2fa', {
+                    errorMessage: 'ERROR! Code expired.'
+                  });
                 }
               } else {
                 response.send('Not matched code');
@@ -334,6 +338,9 @@ app.post('/do_verify_2fa', isNotLoggedIn, async (request, response) => {
             });
           } else {
             // failed due to eth address is not for given user
+            response.render('failed_2fa', {
+              errorMessage: 'ERROR! Signature is wrong.'
+            });
           }
         } else {
           response.send('Not matched code');
@@ -342,9 +349,15 @@ app.post('/do_verify_2fa', isNotLoggedIn, async (request, response) => {
       });
     } else {
       // failed due to invalid signature
+      response.render('failed_2fa', {
+        errorMessage: 'ERROR! Signature is wrong.'
+      });
     }
   } else {
     // failed due to not registered yet
+    response.render('failed_2fa', {
+      errorMessage: 'ERROR! The address has not been registered yet.'
+    });
   }
 });
 
