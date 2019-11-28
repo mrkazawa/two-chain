@@ -205,3 +205,5 @@ typings/
 # my custom list
 .vscode
 **/.idea/
+build/
+node_modules/
