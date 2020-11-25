@@ -207,3 +207,5 @@ typings/
 **/.idea/
 build/
 node_modules/
+auth.db
+package-lock.json

@@ -1,24 +1,28 @@
 {
-  "name": "auth_contract_use_case",
+  "name": "two-chain",
   "version": "1.0.0",
-  "description": "List of dependency: npm install -g truffle npm install -g ganache-cli npm install truffle-assertions npm i --save bs58 npm install --save web3 npm install eth-crypto --save",
-  "main": "truffle-config.js",
+  "description": "Two Factor Authentication Using Blockchain and Smart Contract",
+  "main": "",
   "directories": {
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "eth-network": "ganache-cli --mnemonic dongseo",
+    "init-db": "node 2fa_server/sql_create_table",
+    "delete-db": "node 2fa_server/sql_delete_table",
+    "2fa-server": "truffle deploy && node 2fa_server/2fa",
+    "2fa-client": "node client/eth_tools",
+    "test": "truffle test"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mrkazawa/auth_contract_use_case.git"
+    "url": "https://github.com/mrkazawa/two-chain.git"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Yustus Oktian",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mrkazawa/auth_contract_use_case/issues"
+    "url": "https://github.com/mrkazawa/two-chain.gitissues"
   },
-  "homepage": "https://github.com/mrkazawa/auth_contract_use_case#readme",
   "dependencies": {
     "chalk": "^3.0.0",
     "ejs": "^2.7.1",

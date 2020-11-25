@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const session = require('express-session');
 const bodyParser = require('body-parser');
@@ -9,9 +10,9 @@ const EthCrypto = require('eth-crypto');
 const Web3 = require('web3');
 const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
 
-const contractABIPath = '../build/contracts/RegistryContract.json';
-const contractPath = './contract.json';
-const serverPath = './server.json';
+const contractABIPath = path.normalize('./build/contracts/RegistryContract.json');
+const contractPath = path.normalize('./2fa_server/contract.json');
+const serverPath = path.normalize('./2fa_server/server.json');
 
 const db = new sqlite3.Database('../auth.db', (err) => {
   if (err) {

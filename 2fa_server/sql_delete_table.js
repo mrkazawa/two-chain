@@ -8,12 +8,11 @@ let db = new sqlite3.Database('../auth.db', (err) => {
   console.log('Connected to the in-memory SQlite database.');
 });
 
-// delete required TABLES
-console.log("delete database table users");
 db.run('DROP TABLE users');
+console.log("Table 'users' is deleted!");
 
-console.log("delete database table codes");
-db.run('DROP TABLE 2fa_codes');
+db.run('DROP TABLE codes');
+console.log("Table 'codes' is deleted!");
 
 // close the database connection
 db.close((err) => {
