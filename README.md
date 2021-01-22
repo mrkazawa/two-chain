@@ -1,6 +1,6 @@
 # TwoChain #
 
-This repository is the implementation from our paper "TwoChain: Leveraging Blockchain and Smart Contract for Two Factor Authentication," which is published [here]().
+This repository is the implementation from our paper "TwoChain: Leveraging Blockchain and Smart Contract for Two Factor Authentication," which is published [here](https://ieeexplore.ieee.org/document/9315514).
 
 ## Installation ##
 
